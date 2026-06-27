@@ -197,7 +197,7 @@ The frontend is tailored to withstand active monitoring.
 | Name | Role |
 | :--- | :--- |
 | **Aryan Agarwal** | **Full Stack**|
-| **Swastik Gupta** | **Backend Development & AI**|
+| **Swastik Gupta** | **Full Stack**|
 | **Saharsh Srivastava** | **Machine Learning**|
 | **Daksh Parekh** | **Machine Learning and Backend**|
 
