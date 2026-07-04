@@ -1,29 +1,29 @@
-# CAACE - Corporate Action Agentic Compliance Engine
+# 🕊️ LokAyukt - Smart Governance Platform
+> **Team:** FireNoIce
 
+**Accountable Governance. Every Voice Counts.**
 
-**Unveiling Truth in Financial Filings. Accountability over Autonomy.**
+LokAyukt is a next-generation civic intelligence platform that fuses **AI-Driven Issue Classification**, **Agentic Chatbots (LangGraph)**, and **Geospatial Analytics** to bridge the gap between citizens and municipal authorities. Beyond simple grievance logging, LokAyukt helps authorities understand the *severity, impact, and root cause* behind public complaints, driving rapid and verified resolutions.
 
-CAACE is a next-generation financial compliance platform that fuses **Agentic RAG**, **Deterministic Workflows (LangGraph)**, and **Sandboxed Execution** to process complex corporate actions like Buybacks and Demergers. Beyond simple extraction, CAACE acts as an automated paralegal—calculating yields, flagging regulatory violations, and summarizing insights while keeping a human firmly in the loop.
-
-**Stack:** FastAPI, LangGraph, Celery, PostgreSQL, Qdrant, Groq (Llama-3).
+**Stack:** React 19, Node.js (Express), Python (FastAPI/LangGraph/Transformers), PostgreSQL (Supabase), JWT Authentication, Docker.
 
 ---
 
 ## 🌟 Project Overview
 
 ### 🚩 Problem Statement
-Financial analysts and compliance teams are drowning in 50+ page regulatory PDFs, but standard AI tools fail in this domain.
-*   **Math Hallucinations**: Standard LLMs cannot reliably calculate yields, ratios, or premiums from extracted text.
-*   **LLM Autonomy is Dangerous**: ReAct pipelines allow the AI to decide what to do. In compliance, you cannot trust an AI to "decide" if it should run an audit.
-*   **Lack of Accountability**: When a standard RAG pipeline gets a number wrong, the entire downstream analysis is corrupted without giving the human a chance to intervene.
+Citizens and municipal authorities are disconnected, leading to delayed resolutions and unverified work. 
+*   **Information Silos**: Complaints are logged in rigid databases without intelligent routing, leading to bottlenecks.
+*   **Unverified Resolutions**: Ward officers may mark tasks "resolved" without true ground-level verification.
+*   **Lack of Context & Prioritization**: A critical sewage leak and a minor pothole are often treated with the same urgency due to a lack of automated triage.
 
 ### 🎯 Our Solution
-**CAACE** acts as a strictly deterministic, highly accountable co-pilot for financial document processing.
+**LokAyukt** acts as an intelligent, automated operational console for municipal governance.
 
-1.  **Deterministic Agentic Workflow**: Uses a hardcoded `StateGraph` (LangGraph) that forces a strict sequence: Extraction → Modeling → Auditing → Synthesis.
-2.  **Isolated Math Sandboxing**: LLMs extract the numbers, but pure Python calculates the math inside a network-disabled Docker container.
-3.  **Automated Compliance Auditing**: Hardcoded rules (e.g., SEBI timelines) automatically flag legal violations based on the extracted data.
-4.  **Advanced Human-In-The-Loop (HITL)**: The system intentionally pauses mid-execution, freezing its state to PostgreSQL so a human can correct any data before the final synthesis is generated.
+1.  **AI-Powered Prioritization Engine**: Automatically calculates a priority score (0-100) based on urgency, impact, and recurrence for every complaint.
+2.  **Agentic AI Support (LokaYuktai)**: Role-specific AI chatbots (Citizen, Ward Officer, Admin) powered by **LangGraph** assist users 24/7, fetching live data and automating tasks.
+3.  **Automated ML Verification**: Uses Vision models to compare 'Before' and 'After' images, ensuring officers provide legitimate proof of resolution.
+4.  **Live Heatmap Analytics**: Geospatial clustering allows administrators to spot infrastructure failures before they become crises.
 
 ---
 
@@ -32,171 +32,175 @@ Financial analysts and compliance teams are drowning in 50+ page regulatory PDFs
 ### 🏛️ High-Level Architecture
 ```mermaid
 graph TD
-    User([Compliance Analyst]) -->|HTTPS| Frontend[React Dashboard]
-    Frontend -->|POST PDF| API(FastAPI Gateway)
+    User([Citizen / Officer / Admin]) -->|HTTPS| Frontend[React + Vite Dashboard]
+    Frontend -->|REST| NodeGateway[Node.js Backend]
     
-    subgraph "Ingestion Pipeline"
-        API -->|Task| IngestWorker[Celery Ingestion Worker]
-        IngestWorker -->|Parse| Markdown[PDF to Markdown]
-        Markdown -->|Chunk| Chunker[TikToken Chunker]
-        Chunker -->|fastembed| Embedder[Vectorization]
+    subgraph "AI Intelligence Core (Unified-AI)"
+        NodeGateway -->|Proxy| PyAPI[FastAPI Service]
+        PyAPI -->|Agentic Flow| LangGraph[LangGraph ReAct Executors]
+        PyAPI -->|Classification| NLP[Text/Audio Transformers]
+        PyAPI -->|Proof Validation| Vision[ML Vision Verification]
     end
     
-    subgraph "Persistence Layer"
-        API --> DB[(PostgreSQL)]
-        IngestWorker --> DB
-        Embedder --> VectorDB[(Qdrant)]
-    end
-    
-    subgraph "Intelligence Core (LangGraph)"
-        IngestWorker -->|Trigger ainvoke| Graph[StateGraph Workflow]
-        Graph --> Extractor[Extractor Node]
-        Graph --> Modeler[Modeler Node]
-        Graph --> Auditor[Auditor Node]
-        Graph --> Synthesis[Synthesis Node]
+    subgraph "Persistence"
+        NodeGateway -->|Relational Data| SupabaseDB[(PostgreSQL)]
+        NodeGateway -->|Media Hub| SupabaseStorage[(Supabase Storage Bucket)]
     end
 ```
 
 ### 🧠 The Intelligence Pipeline
-How we turn 50-page PDFs into actionable, compliant intelligence.
+How we turn civic complaints into verified actions.
 
 ```mermaid
 sequenceDiagram
-    participant Worker as Celery Worker
-    participant Graph as LangGraph Engine
-    participant Sandbox as Docker Math Sandbox
-    participant DB as Postgres (Checkpoints)
-    participant UI as Analyst Dashboard
+    participant Citizen
+    participant Node_API
+    participant FastAPI_AI
+    participant Officer
     
-    Worker->>Graph: Initialize State & Trigger Workflow
-    Graph->>Graph: Extractor Node (Hybrid Search Qdrant)
-    Graph->>Sandbox: Modeler Node (Send Extracted Ints/Floats)
-    Sandbox-->>Graph: Return Exact Math Calculations (Yields/Ratios)
-    Graph->>Graph: Auditor Node (Run SEBI Compliance Logic)
-    Graph->>Graph: Synthesis Node (Summarize Findings)
-    Graph->>DB: INTERRUPT: Freeze State to Database
-    UI->>DB: Fetch Frozen State for Review
-    UI->>DB: Analyst Approves/Overrides Variables (aupdate_state)
-    UI->>Worker: Trigger Resume Task
-    Worker->>Graph: Resume Execution from Breakpoint
+    Citizen->>Node_API: Submit Complaint (Image/Audio/Text)
+    Node_API->>FastAPI_AI: Classify Issue & Department
+    FastAPI_AI->>Node_API: Return {Issue_Type, Confidence}
+    Node_API->>Node_API: Assign Priority Score & Route to Ward
+    Node_API-->>Officer: Alert: New High Priority Task
+    Officer->>Node_API: Submit Completion Proof (After Image)
+    Node_API->>FastAPI_AI: Compare Before & After 
+    FastAPI_AI->>Node_API: Verify Resolution (Pass/Fail)
+    Node_API->>Citizen: Update Status (Public Transparency)
 ```
 
 ---
 
 ## ✨ Core Features Explained
 
-### 🚀 Deterministic LangGraph Execution
-*The rigid brain of CAACE.*
+### 🚀 Role-Specific Agentic Support (LokaYuktai)
+*The automated workforce of LokAyukt.*
 
-Unlike ReAct agents that guess what tool to use, CAACE uses a strict StateGraph.
-*   The workflow guarantees that extraction happens first, math happens second, and auditing happens third. 
-*   This predictable execution is absolutely required for enterprise compliance environments.
+Using **FastAPI** and **LangGraph**, we engineered stateful ReAct agents tailored to specific user roles:
+1.  **Citizen Agent**: Empathetic assistant that helps log complaints, tracks grievance status, and broadcasts public transparency updates.
+2.  **Ward Officer Agent**: Administrative assistant that filters the ward's queue, highlights high-priority tasks, and updates statuses dynamically.
+3.  **Municipal Admin Agent**: Strategic advisor that synthesizes macro-level data, analyzing spatial clusters to deduce infrastructure root causes.
 
-### 💼 Isolated Docker Math Sandboxing
-*Zero math hallucinations.*
+### 🏗️ Smart Resource Allocation
+*Deploying municipal assets where they are needed most.*
 
-LLMs are terrible at arithmetic. 
-*   **Execution**: The LLM only extracts raw strings (e.g., "1500").
-*   **Security**: These numbers are passed to a proprietary Sandbox Tool that spins up a completely isolated, read-only Docker container.
-*   **Accuracy**: The container runs pure Python math scripts and returns the exact yield, meaning 100% mathematical accuracy on financial models.
+LokAyukt moves beyond static budgeting by providing dynamic resource management tools:
+*   **Data-Driven Deployment**: Admin and Ward Officers can allocate workers, equipment, and funds directly to high-priority complaints and anomaly clusters detected by the heatmap.
+*   **Demand Forecasting**: By analyzing the recurrence and density of civic issues, the platform highlights which wards are under-resourced, enabling proactive municipal planning rather than reactive scrambling.
 
-### 🛡️ Human-In-The-Loop (HITL) State Mutation
-*Accountability built-in.*
+### 💼 Priority Scoring & Triage
+*Focusing on what matters most.*
 
-In financial compliance, humans must have the final say.
-*   **The Breakpoint**: Before final synthesis, the graph hits an `interrupt_before=["human_review"]` node.
-*   **State Freezing**: LangGraph uses `AsyncPostgresSaver` to perfectly serialize the entire state dictionary as a blob in PostgreSQL, allowing the Celery worker to shut down.
-*   **Time Travel**: When an analyst corrects an AI mistake via the API, CAACE overwrites the PostgreSQL checkpoint via `aupdate_state`, resets the routing, and resumes the graph using the verified data.
+Complaints are no longer first-come, first-serve. The system calculates a dynamic Priority Score:
+*   **Urgency Score**: Derived from the AI classification (e.g., 'Water Contamination' > 'Littering').
+*   **Impact Score**: Logarithmic scaling based on the volume of similar complaints in the same ward over the last 48 hours.
+*   **Recurrence Score**: Identifies chronic failures by analyzing 7-day historical averages.
+*   **Result**: Officers are presented with an automatically sorted queue of critical interventions.
 
-### 📊 Intelligent Markdown Chunking
-*Finding needles in haystacks.*
+### 🛡️ ML Vision Proof Verification
+*Trust, but verify computationally.*
 
-Raw text splitting destroys financial tables.
-*   **Boundary Chunking**: Markdown is intelligently chunked using `tiktoken` with a strict limit of **512 tokens** and a **64 token overlap**, respecting headers and list boundaries.
-*   **Event Isolation**: Qdrant uses payload indexing to guarantee that a search for Event A never accidentally retrieves data from Event B.
-*   **Offset Mapping**: The pipeline maps markdown character offsets back to the raw PDF for exact UI highlighting.
+When a ward officer claims a task is completed:
+*   They must upload an "After" photo.
+*   The unified AI service compares it against the initial "Before" photo or runs it through anomaly-detection vision models.
+*   Status automatically updates to **Resolved** if confidence is > 70%, or flags the task for **Admin Review** if the proof looks suspicious or AI-generated.
 
+### 📊 Interactive Dashboards & Live Geospatial Mapping
+*Premium Design. Instant Clarity.*
+
+The frontend is tailored to withstand active monitoring.
+*   **Admin Heatmaps**: Real-time Leaflet.js maps displaying civic hotspots, letting admins visualize structural decay.
+*   **Officer Queues**: Color-coded, prioritized task lists grouped by department.
+*   **Cross-Device Cloud Storage**: All evidence and audio files are piped to **Supabase Storage**, ensuring teammates can review proof on any device seamlessly.
+    
 ---
 
 ## 🛠️ Technology Stack
 
-### 🧠 AI & Orchestration
-*   **LangGraph** — Core orchestration framework for the deterministic StateGraph workflow.
-*   **Groq (Llama-3.1-8b)** — Blazing fast LLM inference for extraction and synthesis.
-*   **FastEmbed** — On-the-fly dense embedding generation (`BAAI/bge-small-en-v1.5`).
-*   **TikToken** — Intelligent token-aware markdown chunking.
+### 🧠 AI & Backend Intelligence
+*   **Python 3.10+**: Core language for the Unified-AI service.
+*   **FastAPI**: High-performance async API orchestrating model inference.
+*   **LangGraph**: Stateful, multi-actor orchestration for Chat Agents.
+*   **Llama 3.3 (Groq)**: Blazing fast LLM inference powering conversational interfaces.
+*   **Transformers / PyTorch**: Multi-modal classification for text, audio, and image validation.
 
-### ⚙️ Backend & Infrastructure
-*   **FastAPI & Uvicorn** — High-performance async API gateway.
-*   **Celery & Redis** — Background task queue and message broker for async pipeline execution.
-*   **PostgreSQL** — Relational database for events, variables, and LangGraph checkpoints (`langgraph-checkpoint-postgres`).
-*   **Qdrant** — Async-native vector database for semantic chunk storage.
-*   **Docker** — Full-stack containerization and isolated Math Sandbox execution.
+### 💻 Frontend
+*   **React 19**: Latest React features for a responsive UI.
+*   **Vite**: Blazing-fast build tool.
+*   **TailwindCSS**: Utility-first styling with custom governance-themed design tokens (glassmorphism, subtle gradients).
+*   **Leaflet.js**: Interactive geospatial clustering mapping.
+*   **Lucide React**: Beautiful, consistent iconography.
+
+### ⚙️ Backend API & Infrastructure
+*   **Node.js & Express**: API gateway, auth handler, and database synchronizer.
+*   **PostgreSQL (Supabase)**: Relational mapping of wards, complaints, and polls.
+*   **Supabase Storage**: Centralized cloud bucket for all multimedia evidence.
+*   **Docker & Docker Compose**: 3-tier containerization (Frontend, Backend, Unified-AI) ensuring identical environments.
 
 ---
 
-## 🔌 API Endpoints
+## 🔌 API Endpoints (Core)
 
-### Ingestion
-*   `POST /api/v1/ingest/disclosure` — Uploads PDF, creates DB record, and queues the Celery ingestion worker.
+### Complaints & Flow
+*   `POST /api/v1/complaints/create` - AI classifies input and calculates priority.
+*   `GET /api/v1/complaints/ward/:ward_id` - Get sorted priority queue for officers.
+*   `POST /api/v1/complaints/:id/verify-resolution` - Push proof to ML Vision for automated status updates.
 
-### Human-in-the-Loop (Dashboard)
-*   `GET /api/v1/dashboard/events/{event_id}/review` — Fetches the frozen LangGraph state from the Postgres checkpoint for human review.
-*   `POST /api/v1/dashboard/events/{event_id}/approve` — Mutates the checkpoint with human corrections and triggers the Celery resume worker.
+### Agentic Intelligence (FastAPI)
+*   `POST /chat/citizen` - Trigger stateful LangGraph citizen flow.
+*   `POST /chat/ward` - Trigger ward officer assistant flow.
+*   `POST /chat/admin` - Trigger macro-analytical advisor.
+
+### Spatial Data
+*   `GET /api/v1/map/heatmap/city/:id` - Generates density clusters for the front-end maps.
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-*   Python 3.12+
+*   Node.js v18+
+*   Python 3.10+
 *   Docker & Docker Compose
-*   Redis, Qdrant, and PostgreSQL instances running.
 
 ### Installation
 
 1.  **Clone the Repository**
     ```bash
-    git clone https://github.com/heisenbug-collective/caace-system-core.git
-    cd caace-system-core
+    git clone https://github.com/heisenbug-collective/sankalp-irl.git
+    cd Sankalp.irl
     ```
 
 2.  **Environment Variables**
-    Create a `.env` file in the root directory based on `.env.example`:
+    Create a `.env` file in the `Backend` directory:
     ```env
-    GROQ_API_KEY=
-    POSTGRES_USER=
-    POSTGRES_PASSWORD=
-    POSTGRES_DB=
-    DATABASE_URL=
-    QDRANT_URL=
-    CELERY_BROKER_URL=
-    UPLOAD_DIR=
+    PORT=5001
+    DB_USER=...
+    DB_PASSWORD=...
+    DB_HOST=...
+    SUPABASE_URL=...
+    SUPABASE_ANON_KEY=...
+    JWT_SECRET=...
+    GROQ_API_KEY=...
     ```
 
-3.  **Run Locally**
+3.  **Run with Docker Compose**
     ```bash
-    # Install dependencies
-    python -m venv .venv
-    source .venv/bin/activate
-    pip install -r requirements.txt
-    
-    # Start the API
-    uvicorn src.api.main:app --host 0.0.0.0 --port 8000
-    
-    # Start the Celery Worker (In another terminal)
-    celery -A src.workers.celery_app worker --loglevel=info
+    docker compose up --build
     ```
+    *Access the Frontend at `http://localhost:5173`*
 
 ---
 
-## 🤝 Project Team
+## 🤝 Team: FireNoIce
 
 | Name | Role |
 | :--- | :--- |
-| **Aryan Agarwal** | **Backend Development & AI**|
-| **Swastik Gupta** | **Backend Development & AI**|
+| **Aryan Agarwal** | **Full Stack**|
+| **Swastik Gupta** | **Full Stack**|
+| **Saharsh Srivastava** | **Machine Learning**|
+| **Daksh Parekh** | **Machine Learning and Backend**|
 
 ---
 
-
+Made with ❤️ by Team FireNoIce.
